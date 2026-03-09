@@ -39,9 +39,27 @@ namespace Archipelago
             { "infected", "Infection_Progress4" },
         };
         
-        public static int[] AP_VERSION = new int[] { 0, 6, 4 };
+        public static int[] AP_VERSION = new int[] { 0, 6, 6 };
         public static APConnectInfo ServerConnectInfo = new APConnectInfo();
-        public static DeathLinkService DeathLinkService = null;
+        
+        private static DeathLinkService _deathLinkService = null;
+        public static DeathLinkService DeathLinkService
+        {
+            get => _deathLinkService;
+            set
+            {
+                if (_deathLinkService != null)
+                {
+                    _deathLinkService.OnDeathLinkReceived -= DeathLinkReceived;
+                }
+                _deathLinkService = value;
+                if (_deathLinkService != null)
+                {
+                    _deathLinkService.OnDeathLinkReceived += DeathLinkReceived;
+                }
+            }
+        }
+        
         public static bool DeathLinkKilling = false; // indicates player is currently getting DeathLinked
         public static Dictionary<string, int> archipelago_indexes = new ();
         public static float unlock_dequeue_timeout = 0.0f;
@@ -64,7 +82,34 @@ namespace Archipelago
         public static float TrackedDistance;
         public static float TrackedAngle;
 
-        public static ArchipelagoSession Session;
+        private static ArchipelagoSession _session;
+        public static ArchipelagoSession Session
+        {
+            get => _session;
+            set
+            {
+                if (_session != null)
+                {
+                    if (_session.MessageLog != null)
+                    {
+                        _session.MessageLog.OnMessageReceived -= Session_MessageReceived;
+                    }
+                    if (_session.Socket != null)
+                    {
+                        _session.Socket.ErrorReceived -= Session_ErrorReceived;
+                        _session.Socket.SocketClosed -= Session_SocketClosed;
+                    }
+                }
+                _session = value;
+                if (_session != null)
+                {
+                    _session.MessageLog.OnMessageReceived += Session_MessageReceived;
+                    _session.Socket.ErrorReceived += Session_ErrorReceived;
+                    _session.Socket.SocketClosed += Session_SocketClosed;
+                }
+            }
+        }
+        
         public static ArchipelagoUI ArchipelagoUI = null;
         
         public static HashSet<TechType> tech_fragments = new HashSet<TechType>
@@ -198,6 +243,8 @@ namespace Archipelago
                 return true;
             }
 
+            Disconnect();
+
             if (ServerConnectInfo.host_name is null || ServerConnectInfo.host_name.Length == 0)
             {
                 return false;
@@ -211,19 +258,27 @@ namespace Archipelago
                 ServerConnectInfo.host_name = $"wss://archipelago.gg:{ServerConnectInfo.host_name}";
             }
             Session = ArchipelagoSessionFactory.CreateSession(ServerConnectInfo.host_name);
-            Session.MessageLog.OnMessageReceived += Session_MessageReceived;
-            Session.Socket.ErrorReceived += Session_ErrorReceived;
-            Session.Socket.SocketClosed += Session_SocketClosed;
 
             HashSet<TechType> vanillaTech = new HashSet<TechType>();
-            LoginResult loginResult = Session.TryConnectAndLogin(
-                "Subnautica", 
-                ServerConnectInfo.slot_name,
-                ItemsHandlingFlags.AllItems, 
-                new Version(AP_VERSION[0], AP_VERSION[1], AP_VERSION[2]),
-                null, 
-                "",
-                ServerConnectInfo.password);
+            LoginResult loginResult;
+            try
+            {
+                loginResult = Session.TryConnectAndLogin(
+                    "Subnautica",
+                    ServerConnectInfo.slot_name,
+                    ItemsHandlingFlags.AllItems,
+                    new Version(AP_VERSION[0], AP_VERSION[1], AP_VERSION[2]),
+                    null,
+                    "",
+                    ServerConnectInfo.password);
+            }
+            catch (Exception e)
+            {
+                Authenticated = false;
+                Logging.LogError("Connection Error: " + e.Message);
+                Disconnect();
+                return false;
+            }
 
             if (loginResult is LoginSuccessful loginSuccess)
             {
@@ -277,7 +332,7 @@ namespace Archipelago
             {
                 Authenticated = false;
                 Logging.LogError("Connection Error: " + String.Join("\n", loginFailure.Errors));
-                Session = null;
+                Disconnect();
             }
             // all fragments
             TechFragmentsToDestroy = new HashSet<TechType>(APState.tech_fragments);
@@ -311,12 +366,28 @@ namespace Archipelago
         {
             Authenticated = false;
             state = State.Menu;
-            if (Session != null && Session.Socket != null && Session.Socket.Connected)
-            {
-                Task.Run(() => {Session.Socket.DisconnectAsync(); }).Wait();
-            }
 
-            Session = null;
+            if (Session != null)
+            {
+                if (Session.Socket != null && Session.Socket.Connected)
+                {
+                    var socket = Session.Socket;
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            socket.DisconnectAsync();
+                        }
+                        catch
+                        {
+                            // ignore
+                        }
+                    });
+                }
+
+                Session = null;
+            }
+            DeathLinkService = null;
         }
         public static void DeathLinkReceived(DeathLink deathLink)
         {
@@ -371,6 +442,11 @@ namespace Archipelago
         {
             if (ServerConnectInfo.@checked.Add(id))
             {
+                if (Session == null || !Authenticated)
+                {
+                    return;
+                }
+
                 Task.Run(() => {Session.Locations.CompleteLocationChecksAsync(
                     ServerConnectInfo.@checked.Except(Session.Locations.AllLocationsChecked).ToArray()); }).ConfigureAwait(false);
             }
@@ -594,10 +670,14 @@ namespace Archipelago
         
         public static void set_deathlink()
         {
+            if (Session == null)
+            {
+                return;
+            }
+
             if (DeathLinkService == null)
             {
                 DeathLinkService = Session.CreateDeathLinkService();
-                DeathLinkService.OnDeathLinkReceived += DeathLinkReceived;
             }
             
             if (ServerConnectInfo.death_link)
@@ -612,6 +692,11 @@ namespace Archipelago
         
         public static void send_completion()
         {
+            if (Session == null)
+            {
+                return;
+            }
+
             var statusUpdatePacket = new StatusUpdatePacket();
             statusUpdatePacket.Status = ArchipelagoClientState.ClientGoal;
             Session.Socket.SendPacket(statusUpdatePacket);

@@ -662,7 +662,7 @@ namespace Archipelago
         [HarmonyPostfix]
         public static void GameClosing()
         {
-            APState.state = APState.State.Menu;
+            APState.Disconnect();
         }
     }
 
@@ -768,7 +768,7 @@ namespace Archipelago
             }
 
             // Do unlocks
-            if (IsSafeToUnlock())
+            if (IsSafeToUnlock() && APState.Session != null)
             {
                 if (APState.ServerConnectInfo.index < APState.Session.Items.AllItemsReceived.Count)
                 {
