@@ -640,11 +640,7 @@ namespace Archipelago
                 using (StreamReader reader = new StreamReader(path))
                 {
                     APState.ServerConnectInfo = JsonConvert.DeserializeObject<APConnectInfo>(reader.ReadToEnd());
-                    var connected = APState.Connect();
-                    if (connected && APState.ServerConnectInfo.@checked != null)
-                    {
-                        APState.Session.Locations.CompleteLocationChecks(APState.ServerConnectInfo.@checked.ToArray());
-                    }
+                    APState.Connect();
                 }
             }
             // compat handling, remove later

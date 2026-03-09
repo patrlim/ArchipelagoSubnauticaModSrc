@@ -268,6 +268,10 @@ namespace Archipelago
                 ServerConnectInfo.death_link = Convert.ToInt32(loginSuccess.SlotData["death_link"]) > 0;
                 set_deathlink();
 
+                if (ServerConnectInfo.@checked.Count > 0)
+                {
+                    Task.Run(() => { Session.Locations.CompleteLocationChecksAsync(ServerConnectInfo.@checked.ToArray()); }).ConfigureAwait(false);
+                }
             }
             else if (loginResult is LoginFailure loginFailure)
             {
@@ -374,6 +378,14 @@ namespace Archipelago
 
         public static void Resync()
         {
+            if (Session == null || !Authenticated) return;
+            
+            if (ServerConnectInfo.@checked.Count > 0)
+            {
+                Logging.LogDebug("Running Location resync with " + ServerConnectInfo.@checked.Count + " locations.");
+                Task.Run(() => { Session.Locations.CompleteLocationChecksAsync(ServerConnectInfo.@checked.ToArray()); }).ConfigureAwait(false);
+            }
+
             Logging.LogDebug("Running Item resync with " + Session.Items.AllItemsReceived.Count + " items.");
             var done = new HashSet<long>();
             for (int i = 0; i < Session.Items.AllItemsReceived.Count; i++)
