@@ -10,6 +10,7 @@ using Archipelago.MultiClient.Net.Packets;
 using System.Text;
 using Archipelago.MultiClient.Net;
 using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+using Archipelago.MultiClient.Net.Helpers;
 using Newtonsoft.Json;
 using File = System.IO.File;
 using Object = UnityEngine.Object;
@@ -994,15 +995,20 @@ namespace Archipelago
             }
         }
     }
-    // Prevent MultiClient.Net from logging the .Net version to datastore
-    [HarmonyPatch(typeof(ArchipelagoSession))]
-    [HarmonyPatch("LogUsedVersion")]
-    internal class DontLog
+    // Patch version of https://github.com/ArchipelagoMW/Archipelago.MultiClient.Net/pull/135
+    [HarmonyPatch(typeof(ArchipelagoSocketHelper), nameof(ArchipelagoSocketHelper.SendPacket), new Type[] { typeof(ArchipelagoPacketBase) })]
+    internal static class IndividualDataPackageRequestsPatch
     {
         [HarmonyPrefix]
-        public static bool NoLog()
+        private static bool Prefix(ArchipelagoSocketHelper __instance, ArchipelagoPacketBase packet)
         {
-            return false;
+            if (packet is GetDataPackagePacket dataPackagePacket && dataPackagePacket.Games?.Length > 1)
+            {
+                var packets = dataPackagePacket.Games.Select(game => new GetDataPackagePacket { Games = new[] { game } }).ToArray();
+                __instance.SendMultiplePackets(packets);
+                return false;
+            }
+            return true;
         }
     }
 }
