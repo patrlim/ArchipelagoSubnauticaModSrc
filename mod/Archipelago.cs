@@ -217,11 +217,11 @@ namespace Archipelago
                 {
                     int i = 0;
                     int j = 125;
-                    foreach (var kv in APState.ITEM_CODE_TO_TECHTYPE)
+                    foreach (var kv in ArchipelagoData.ItemCodeToTechType)
                     {
                         if (GUI.Button(new Rect(16 + i, j, 200, 25), kv.Value.ToString()))
                         {
-                            APState.unlock(kv.Value);
+                            APState.Unlock(kv.Key, 0);
                         }
                         j += 30;
                         if (j + 30 >= Screen.height)
@@ -316,7 +316,7 @@ namespace Archipelago
             if (APState.Silent)
             {
                 Logging.Log("Muted Archipelago chat.");
-                APState.message_queue.Clear();
+                APState.message_queue = new System.Collections.Concurrent.ConcurrentQueue<string>();
             }
             else
             {
@@ -760,10 +760,9 @@ namespace Archipelago
             {
                 // We only do x at a time. To not crowd the on screen log/events too fast
                 List<string> toProcess = new List<string>();
-                while (toProcess.Count < dequeueCount && APState.message_queue.Count > 0)
+                while (toProcess.Count < dequeueCount && APState.message_queue.TryDequeue(out var message))
                 {
-                    toProcess.Add(APState.message_queue[0]);
-                    APState.message_queue.RemoveAt(0);
+                    toProcess.Add(message);
                 }
                 foreach (var message in toProcess)
                 {

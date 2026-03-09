@@ -10,6 +10,8 @@ public static class Logging
 {
     public static Thread MainThread = null;
     public static ConcurrentQueue<Tuple<string, bool>> UnityLogQueue = new ConcurrentQueue<Tuple<string, bool>>();
+    public static ConcurrentQueue<string> IngameLogQueue = new ConcurrentQueue<string>();
+    public static ConcurrentQueue<Action> MainThreadActions = new ConcurrentQueue<Action>();
 
     public static void Initialize()
     {
@@ -20,7 +22,7 @@ public static class Logging
     {
         if (ingame)
         {
-            ErrorMessage.AddMessage(message);
+            IngameLogQueue.Enqueue(message);
         }
 
         if (unity_log)
@@ -45,24 +47,28 @@ public static class Logging
     {
         if (Thread.CurrentThread == MainThread)
         {
-            Tuple<string, bool> nextText;
-            while (true)
+            while (IngameLogQueue.TryDequeue(out var ingameMessage))
             {
-                bool success = UnityLogQueue.TryDequeue(out nextText);
-                if (!success)
-                {
-                    return true;
-                }
+                ErrorMessage.AddMessage(ingameMessage);
+            }
 
-                if (nextText.Item2)
+            while (MainThreadActions.TryDequeue(out var action))
+            {
+                action();
+            }
+
+            while (UnityLogQueue.TryDequeue(out var unityLog))
+            {
+                if (unityLog.Item2)
                 {
-                    Debug.LogError(nextText.Item1);
+                    Debug.LogError(unityLog.Item1);
                 }
                 else
                 {
-                    Debug.Log(nextText.Item1);
+                    Debug.Log(unityLog.Item1);
                 }
             }
+            return true;
         }
         return false;
     }

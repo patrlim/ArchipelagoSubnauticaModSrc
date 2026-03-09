@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -44,7 +45,7 @@ namespace Archipelago
         public static bool DeathLinkKilling = false; // indicates player is currently getting DeathLinked
         public static Dictionary<string, int> archipelago_indexes = new ();
         public static float unlock_dequeue_timeout = 0.0f;
-        public static List<string> message_queue = new ();
+        public static ConcurrentQueue<string> message_queue = new ();
         public static float message_dequeue_timeout = 0.0f;
         public static State state = State.Menu;
         public static bool Authenticated;
@@ -292,7 +293,7 @@ namespace Archipelago
         {
             if (!Silent)
             {
-                message_queue.Add(message.ToString());
+                message_queue.Enqueue(message.ToString());
             }
         }
         static void Session_ErrorReceived(Exception e, string message)
@@ -315,12 +316,14 @@ namespace Archipelago
         }
         public static void DeathLinkReceived(DeathLink deathLink)
         {
-            if (!(bool) (UnityEngine.Object) Player.main.liveMixin)
-                return;
             Logging.LogDebug("Received DeathLink");
-            DeathLinkKilling = true;
-            Player.main.liveMixin.Kill();
-            message_queue.Add(deathLink.Cause);
+            Logging.MainThreadActions.Enqueue(() => {
+                if (!(bool) (UnityEngine.Object) Player.main.liveMixin)
+                    return;
+                DeathLinkKilling = true;
+                Player.main.liveMixin.Kill();
+                message_queue.Enqueue(deathLink.Cause);
+            });
         }
 
         public static bool CheckLocation(Vector3 position)
@@ -345,7 +348,7 @@ namespace Archipelago
 #if DEBUG
             ErrorMessage.AddError("Tried to check unregistered Location at: " + position);
             Debug.LogError("Tried to check unregistered Location at: " + position);
-            foreach (var location in LOCATIONS)
+            foreach (var location in ArchipelagoData.Locations)
             {
                 var dist = Vector3.Distance(location.Value.Position, position);
                 if (dist < closestDist)
