@@ -995,20 +995,4 @@ namespace Archipelago
             }
         }
     }
-    // Patch version of https://github.com/ArchipelagoMW/Archipelago.MultiClient.Net/pull/135
-    [HarmonyPatch(typeof(ArchipelagoSocketHelper), nameof(ArchipelagoSocketHelper.SendPacket), new Type[] { typeof(ArchipelagoPacketBase) })]
-    internal static class IndividualDataPackageRequestsPatch
-    {
-        [HarmonyPrefix]
-        private static bool Prefix(ArchipelagoSocketHelper __instance, ArchipelagoPacketBase packet)
-        {
-            if (packet is GetDataPackagePacket dataPackagePacket && dataPackagePacket.Games?.Length > 1)
-            {
-                var packets = dataPackagePacket.Games.Select(game => new GetDataPackagePacket { Games = new[] { game } }).ToArray();
-                __instance.SendMultiplePackets(packets);
-                return false;
-            }
-            return true;
-        }
-    }
 }
