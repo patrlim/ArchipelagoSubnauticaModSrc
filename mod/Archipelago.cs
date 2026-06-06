@@ -230,11 +230,15 @@ namespace Archipelago
                                 + (int)APState.TrackedAngle + "°) away";
                         text += ", named " + APState.TrackedLocationName;
                         TrackerPingParent.transform.position = APState.TrackedPos;
-                        TrackerPingInstance.SetLabel("[AP] - " + APState.TrackedLocationName);
                         float trackedLocationDepth = -APState.TrackedPos.y;
                         float logicalDepth = (TrackerThread.LogicSwimDepth + TrackerThread.LogicVehicleDepth);
                         int color = trackedLocationDepth >= logicalDepth ? 2 : 3;
                         TrackerPingInstance.SetColor(color);
+                        string pingText = "[AP] - " + APState.TrackedLocationName;
+                        if(trackedLocationDepth > 0) {
+                            pingText += " ("+trackedLocationDepth+")";
+                        }
+                        TrackerPingInstance.SetLabel("[AP] - " + APState.TrackedLocationName);
                     }
                     GUI.Label(new Rect(16, 36, 1000, 20), text);
                 }
