@@ -236,7 +236,7 @@ namespace Archipelago
                         TrackerPingInstance.SetColor(color);
                         string pingText = "[AP] - " + APState.TrackedLocationName;
                         if(trackedLocationDepth > 0) {
-                            pingText += " ("+(Math.Ceiling(trackedLocationDepth/50)*50)+"m)";
+                            pingText += " ("+(Math.Round(trackedLocationDepth/25)*25)+"m)";
                         }
                         TrackerPingInstance.SetLabel(pingText);
                     }
