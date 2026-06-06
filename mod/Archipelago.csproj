@@ -9,50 +9,50 @@
 
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/BepInEx/core/0Harmony.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/Assembly-CSharp.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Publicize Include="Assembly-CSharp" IncludeCompilerGeneratedMembers="false" />
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/BepInEx/core/BepInEx.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx.Harmony">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/BepInEx/core/BepInEx.Harmony.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\BepInEx\core\BepInEx.Harmony.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx.Preloader">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/BepInEx/core/BepInEx.Preloader.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\BepInEx\core\BepInEx.Preloader.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>special/Newtonsoft.Json.dll</HintPath>
+      <HintPath>special\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PlatformIODefault">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/PlatformIODefault.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\PlatformIODefault.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Addressables">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/Unity.Addressables.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\Unity.Addressables.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/UnityEngine.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/UnityEngine.UI.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>/home/patrlim/Games/Heroic/Subnautica/Subnautica_Data/Managed/UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>E:\SteamLibrary\SteamApps\common\Subnautica\Subnautica_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
   </ItemGroup>
 
