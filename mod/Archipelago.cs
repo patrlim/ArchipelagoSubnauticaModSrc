@@ -239,7 +239,9 @@ namespace Archipelago
                     GUI.Label(new Rect(16, 36, 1000, 20), text);
                 }
                 else {
-                    CleanUpTrackerPing();
+                    if(TrackerPingInstance != null) {
+                        CleanUpTrackerPing();
+                    }
                 }
 
                 if (APState.TrackedFishCount > 0 && APState.TrackedMode != TrackerMode.Disabled)
