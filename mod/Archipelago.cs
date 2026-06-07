@@ -82,7 +82,7 @@ namespace Archipelago
             // int picked at random
             TrackerPingInstance.SetType((PingType)27015);
             TrackerPingInstance.SetLabel("Wisely done Mr Freeman, but, You're not supposed to be here...");
-            TrackerPingInstance.SetVisible(false);
+            TrackerPingInstance.SetVisible(true);
             TrackerPingInstance.SetColor(0);
             
             TrackerPingInstance.origin = TrackerPingParent.transform;
